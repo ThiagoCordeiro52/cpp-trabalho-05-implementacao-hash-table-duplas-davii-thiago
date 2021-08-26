@@ -18,7 +18,7 @@ Preencha os dados abaixo para identificar a autoria do trabalho.
 - [T] Regular constructor (2 credits)
 - [X] Destructor (2 credits)
 - [T] Copy constructor (3 credits)
-- [D] Constructor from initialize list (3 credits)
+- [X] Constructor from initialize list (3 credits)
 - [D] Assignment operator `operator=(list)` (2 credits)
 - [T] Assignment operator `operator=(initializer list)` (2 credits)
 
@@ -34,6 +34,8 @@ Preencha os dados abaixo para identificar a autoria do trabalho.
 - [D] `operator[]()` (11 credits)
 - [T] `count()` (6 credits)
 - [D] `rehash()` (15 credits);
+
+
 
 --------
 &copy; DIMAp/UFRN 2021.

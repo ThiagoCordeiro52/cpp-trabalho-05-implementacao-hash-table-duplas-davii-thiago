@@ -18,7 +18,11 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( const std::initializer_list<entry_type>& ilist )
     {
-        // TODO
+        m_size = DEFAULT_SIZE;
+        m_count = 0;
+        m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
+        for (auto& e: ilist)
+            insert(e.m_key, e.m_data);
     }
 
     /// Assignment operator.
@@ -43,7 +47,7 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::~HashTbl( )
 	{
-        // TODO
+        /* empty */
 	}
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >

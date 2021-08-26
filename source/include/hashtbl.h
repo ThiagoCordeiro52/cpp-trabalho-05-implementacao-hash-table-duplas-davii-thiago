@@ -9,6 +9,7 @@
 #include <cmath>        // sqrt
 #include <iterator>     // std::begin(), std::end()
 #include <initializer_list>
+#include <memory>
 #include <utility> // std::pair
 
 namespace ac // Associative container
@@ -74,7 +75,7 @@ namespace ac // Associative container
             size_type m_count;//!< Numero de elementos na tabel.
             std::unique_ptr< std::forward_list< entry_type > [] > m_table;
             //std::list< entry_type > *mpDataTable; //!< Tabela de listas para entradas de tabela.
-            static const short DEFAULT_SIZE = 10;
+            static const short DEFAULT_SIZE = 11;
     };
 
 } // MyHashTable
