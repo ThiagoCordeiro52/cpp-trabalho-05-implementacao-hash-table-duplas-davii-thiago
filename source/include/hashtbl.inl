@@ -4,7 +4,7 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( size_type sz )
 	{
-        // TODO
+        
 	}
 
     /// Copy constructor
