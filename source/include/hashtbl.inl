@@ -135,12 +135,31 @@ namespace ac {
         return false;
     }
 
+    /// Check if the number n is prime 
+	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
+    bool HashTbl<KeyType,DataType,KeyHash,KeyEqual>::is_prime( size_type  n ) {
+        int counter{0};
+        for (int i = 1; i <= (int) sqrt(n); i++) {
+            if(n % i == 0) {
+                counter++;
+            }
+        }
+        if(counter > 1) {
+            return true
+        }
+        return false;
+    }
 
     /// Find the next prime >= n_
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-    std::size_t HashTbl<KeyType,DataType,KeyHash,KeyEqual>::find_next_prime( size_type  n_ )
+    std::size_t HashTbl<KeyType,DataType,KeyHash,KeyEqual>::find_next_prime( size_type  n )
     {
-        // TODO
+        for(int i = n; i < n + n; i++) {
+            auto result = is_prime(i);
+            if (result) {
+                return i;
+            }
+        }
         return 0; // Stub
     }
 

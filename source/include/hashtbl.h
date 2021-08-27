@@ -68,6 +68,7 @@ namespace ac // Associative container
 
         private:
             static size_type find_next_prime( size_type );
+            static bool is_prime( size_type );
             void rehash( void );
 
         private:
