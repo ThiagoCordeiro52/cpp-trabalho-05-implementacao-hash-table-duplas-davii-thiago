@@ -73,7 +73,7 @@ namespace ac // Associative container
         private:
             size_type m_size; //!< Tamanho da tabela.
             size_type m_count;//!< Numero de elementos na tabel.
-            std::unique_ptr< std::forward_list< entry_type > [] > m_table;
+            std::unique_ptr<list_type[]> m_table;
             //std::list< entry_type > *mpDataTable; //!< Tabela de listas para entradas de tabela.
             static const short DEFAULT_SIZE = 11;
     };

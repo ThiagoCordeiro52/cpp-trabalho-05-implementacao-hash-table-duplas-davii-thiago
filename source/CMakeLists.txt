@@ -23,3 +23,5 @@ include_directories( driver )
 add_executable(driver_hash driver/account.cpp
                            driver/driver_ht.cpp )
 target_compile_features(driver_hash PUBLIC cxx_std_11)
+
+set(CMAKE_CXX_FLAGS "-g")

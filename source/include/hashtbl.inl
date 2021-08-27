@@ -25,12 +25,22 @@ namespace ac {
             insert(e.m_key, e.m_data);
     }
 
+    // TODO: relook this method
     /// Assignment operator.
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>&
     HashTbl<KeyType,DataType,KeyHash,KeyEqual>::operator=( const HashTbl& clone )
     {
-        // TODO
+        if (m_size != clone.m_size) {
+            m_size = clone.m_size;
+            auto new_table {std::unique_ptr<list_type[]>(new list_type[m_size])};
+            m_table = std::move(new_table);
+        } else {
+            for (auto i{0u}; i < m_size; i++) {
+                m_table[i] = clone.m_table[i];
+            }
+        }
+
         return *this;
     }
 
@@ -61,7 +71,9 @@ namespace ac {
     template <typename KeyType, typename DataType, typename KeyHash, typename KeyEqual>
     void HashTbl<KeyType, DataType, KeyHash, KeyEqual>::clear()
     {
-        // TODO
+        for (auto i{0u}; i < m_size; i++) {
+            m_table[i].clear();
+        }
     }
 
     //! Tests whether the table is empty.
@@ -94,14 +106,33 @@ namespace ac {
     template <typename KeyType, typename DataType, typename KeyHash, typename KeyEqual>
     void HashTbl<KeyType, DataType, KeyHash, KeyEqual>::rehash( void )
     {
-        // TODO
+        auto hash_function {KeyHash{}};
+
+        auto new_size {find_next_prime(m_size * 2)};
+        auto new_table {std::unique_ptr<list_type[]>(new list_type[new_size])};
+
+        for (auto i {0u}; i < m_size; i++) {
+            for (auto it {m_table[i].begin()}; it != m_table[i].begin(); it++) {
+                auto pos {hash_function(it->key) % new_size};
+                new_table[pos].emplace_front(it->m_key, it->m_data);
+            }
+        }
+
+        m_table = std::move(new_table);
     }
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-    bool HashTbl< KeyType, DataType, KeyHash, KeyEqual >::erase( const KeyType & key_ )
+    bool HashTbl< KeyType, DataType, KeyHash, KeyEqual >::erase( const KeyType & key )
     {
-        // TODO
-        return false; // This is just a stub. Reaplace it accordinly.
+        auto pos {KeyHash{}(key) % m_size};
+        auto equal_func {KeyEqual{}};
+        for (auto it {m_table[pos].begin()}; it != m_table[pos].end(); it++) {
+            if (equal_func(it->m_key, key)) {
+                m_table[pos].erase_after(it);
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -116,10 +147,16 @@ namespace ac {
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
     typename HashTbl< KeyType, DataType, KeyHash, KeyEqual >::size_type
-    HashTbl< KeyType, DataType, KeyHash, KeyEqual >::count( const KeyType & key_ ) const
+    HashTbl< KeyType, DataType, KeyHash, KeyEqual >::count( const KeyType & key ) const
     {
-        // TODO
-        return 0; // Stub
+        auto pos {KeyHash{}(key) % m_size};
+        auto count {0u};
+        auto equal_func {KeyEqual{}};
+        for (auto it {m_table[pos].begin()}; it != m_table[pos].end(); it++) {
+            if (equal_func(it->m_key, key))
+                count++;
+        }
+        return count;
     }
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
@@ -130,9 +167,15 @@ namespace ac {
     }
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-    DataType& HashTbl<KeyType, DataType, KeyHash, KeyEqual>::operator[]( const KeyType & key_ )
+    DataType& HashTbl<KeyType, DataType, KeyHash, KeyEqual>::operator[]( const KeyType & key )
     {
-        // TODO
-        return m_table[0].begin()->m_data; // Stub
+        auto pos {KeyHash{}(key) % m_size};
+        auto equal_func {KeyEqual{}};
+        for (auto it {m_table[pos].begin()}; it != m_table[pos].end(); it++) {
+            if (equal_func(it->m_key, key))
+                return it->m_data;
+        }
+        m_table[pos].emplace_front(key, DataType{});
+        return m_table[pos].front().m_data; // Stub
     }
 } // Namespace ac.
