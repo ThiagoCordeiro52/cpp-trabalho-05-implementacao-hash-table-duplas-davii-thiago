@@ -4,7 +4,14 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( size_type sz )
 	{
-        
+        auto result = is_prime(sz);
+        if(result) {
+            m_size = sz;
+        } else {
+            m_size = find_next_prime(sz);
+        }
+        m_count = 0;
+        m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
 	}
 
     /// Copy constructor
@@ -145,7 +152,7 @@ namespace ac {
             }
         }
         if(counter > 1) {
-            return true
+            return true;
         }
         return false;
     }
