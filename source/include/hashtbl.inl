@@ -18,7 +18,15 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( const HashTbl& source )
 	{
-        // TODO
+        if (m_size != source.m_size) {
+            m_size = source.m_size;
+            auto new_table {std::unique_ptr<list_type[]>(new list_type[m_size])};
+            m_table = std::move(new_table);
+        }
+        for (auto i{0u}; i < m_size; i++) {
+                m_table[i] = source.m_table[i];
+            }
+        m_count = source.m_count;
 	}
 
     /// Initializer constructor
@@ -56,7 +64,13 @@ namespace ac {
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>&
     HashTbl<KeyType,DataType,KeyHash,KeyEqual>::operator=( const std::initializer_list< entry_type >& ilist )
     {
-        // TODO
+        m_table.clear();
+        if(ilist.size() > m_size) {
+            m_size = ilist.size();
+            m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
+        }
+        for (auto& e: ilist)
+            insert(e.m_key, e.m_data);
         return *this;
     }
 
@@ -76,12 +90,12 @@ namespace ac {
        // Apply double hashing method , one functor and the other with modulo function.
        auto end { hashFunc( key ) % m_size };
        auto auxiliaryFirst = m_table[end].begin();
-        while (auxiliaryFirst != m_table[end].end()) {
+       while (auxiliaryFirst != m_table[end].end()) {
             // Comparing keys inside the collision list.
             auto it = *auxiliaryFirst;
-            if ( true == equalFunc( it.m_key , new_entry.m_key ) )
+            if ( equalFunc( it.m_key, new_entry.m_key ) == true )
             {
-                it = new_entry;
+                *(auxiliaryFirst) = new_entry;
                 return false;
             }
             auxiliaryFirst++;
@@ -124,9 +138,24 @@ namespace ac {
      *  \return true if the data item is found; false, otherwise.
      */
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-    bool HashTbl<KeyType, DataType, KeyHash, KeyEqual>::retrieve( const KeyType & key_, DataType & data_item_ ) const
+    bool HashTbl<KeyType, DataType, KeyHash, KeyEqual>::retrieve( const KeyType & key, DataType & data_item ) const
     {
-        // TODO
+        KeyHash hashFunc; // Instantiate the " functor " for primary hash.
+        KeyEqual equalFunc; // Instantiate the " functor " for the equal to test.
+        entry_type new_entry { key, data_item };
+        auto end { hashFunc( key ) % m_size };
+        auto auxiliaryFirst = m_table[end].begin();
+        while (auxiliaryFirst != m_table[end].end()) {
+            // Comparing keys inside the collision list.
+            auto it = *auxiliaryFirst;
+            if ( equalFunc( it.m_key, new_entry.m_key ) == true )
+            {
+                data_item = it.m_data;
+                return true;
+            }
+            auxiliaryFirst++;
+        }
+        
         return false; // This is just a stub. Reaplace it accordinly.
     }
 
@@ -207,10 +236,22 @@ namespace ac {
     }
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-    DataType& HashTbl<KeyType, DataType, KeyHash, KeyEqual>::at( const KeyType & key_ )
+    DataType& HashTbl<KeyType, DataType, KeyHash, KeyEqual>::at( const KeyType & key )
     {
-        // TODO
-        return m_table[0].begin()->m_data; // Stub
+        KeyHash hashFunc; // Instantiate the " functor " for primary hash.
+        KeyEqual equalFunc; // Instantiate the " functor " for the equal to test.
+        auto end { hashFunc( key ) % m_size };
+        auto auxiliaryFirst = m_table[end].begin();
+        while (auxiliaryFirst != m_table[end].end()) {
+            // Comparing keys inside the collision list.
+            auto it = *auxiliaryFirst;
+            if ( equalFunc( it.m_key, key ) == true )
+            {
+                return auxiliaryFirst->m_data;
+            }
+        }
+        throw std::out_of_range("at(): invalid key for this method.");
+        // return m_table[0].begin()->m_data; // Stub
     }
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
