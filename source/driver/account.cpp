@@ -12,17 +12,17 @@ Account::Account( std::string n, int bnc, int brc, int nmr, float bal )
       , m_balance( bal )
 { /* Empty */ }
 
-/// Returns the account key.
-Account::AcctKey Account::getKey(void) const {
-    return std::make_tuple( m_name, m_bank_code, m_branch_code, m_number );
-}
-
 std::ostream& operator<< ( std::ostream & os_, const Account::AcctKey & ak_ ) {
     return os_ << "K{"
                << std::get<0>( ak_ ) << ","
                << std::get<1>( ak_ ) << ","
                << std::get<2>( ak_ ) << ","
                << std::get<3>( ak_ ) << "}";
+}
+
+/// Returns the account key.
+Account::AcctKey Account::getKey(void) const {
+    return std::make_tuple( m_name, m_bank_code, m_branch_code, m_number );
 }
 
 /// Stream extractor of the account information. 

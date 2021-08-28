@@ -31,6 +31,8 @@ struct Account {
 	friend std::ostream &operator<< ( std::ostream & _os, const Account & _acct );
 };
 
+std::ostream& operator<< ( std::ostream & os_, const Account::AcctKey & ak_ );
+
 /// Compare two accounts
 bool operator==( const Account & a, const Account & b );
 

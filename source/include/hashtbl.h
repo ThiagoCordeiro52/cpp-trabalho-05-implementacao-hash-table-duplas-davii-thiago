@@ -25,8 +25,8 @@ namespace ac // Associative container
         DataType m_data; //! The data
 
         friend std::ostream & operator<<( std::ostream & os_, const HashEntry & he_ ) {
-            // os_ << "{" << he_.m_key << "," << he_.m_data << "}";
-            os_ << he_.m_data;
+            os_ << he_.m_key << " => " << he_.m_data;
+            // os_ << he_.m_data;
             return os_;
         }
     };
@@ -62,9 +62,16 @@ namespace ac // Associative container
             float max_load_factor() const;
             void max_load_factor(float mlf);
 
-            friend std::ostream & operator<<( std::ostream & os_, const HashTbl & ht_ ) {
-                // TODO
-                return os_;
+            friend std::ostream & operator<<( std::ostream & os, const HashTbl & ht ) {
+
+                os << "{ ";
+                for (auto i{0u}; i < ht.m_size; i++) {
+                    for (auto it{ht.m_table[i].begin()}; it != ht.m_table[i].end(); it++) {
+                        os << *it << ", ";
+                    }
+                }
+                os << '}';
+                return os;
             }
 
         private:
@@ -76,6 +83,7 @@ namespace ac // Associative container
             size_type m_size; //!< Tamanho da tabela.
             size_type m_count;//!< Numero de elementos na tabel.
             std::unique_ptr<list_type[]> m_table;
+            float m_max_load_factor;
             //std::list< entry_type > *mpDataTable; //!< Tabela de listas para entradas de tabela.
             static const short DEFAULT_SIZE = 11;
     };
