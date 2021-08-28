@@ -16,12 +16,13 @@ namespace ac // Associative container
 {
 	template<class KeyType, class DataType>
 	struct HashEntry {
-        KeyType m_key;   //! Data key
-        DataType m_data; //! The data
+
 
         // Regular constructor.
         HashEntry( KeyType kt_, DataType dt_ ) : m_key{kt_} , m_data{dt_}
         {/*Empty*/}
+                KeyType m_key;   //! Data key
+        DataType m_data; //! The data
 
         friend std::ostream & operator<<( std::ostream & os_, const HashEntry & he_ ) {
             // os_ << "{" << he_.m_key << "," << he_.m_data << "}";

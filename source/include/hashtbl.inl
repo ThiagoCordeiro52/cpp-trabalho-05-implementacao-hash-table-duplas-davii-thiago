@@ -2,7 +2,7 @@
 
 namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( size_type sz )
+	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( size_type sz  )
 	{
         auto result = is_prime(sz);
         if(result) {
@@ -68,10 +68,28 @@ namespace ac {
 	}
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-	bool HashTbl<KeyType,DataType,KeyHash,KeyEqual>::insert( const KeyType & key_, const DataType & new_data_ )
+	bool HashTbl<KeyType,DataType,KeyHash,KeyEqual>::insert( const KeyType & key, const DataType & new_data )
     {
-        // TODO
-        return false; // This is just a stub. Reaplace it accordinly.
+       KeyHash hashFunc; // Instantiate the " functor " for primary hash.
+       KeyEqual equalFunc; // Instantiate the " functor " for the equal to test.
+       entry_type new_entry { key, new_data }; // Create a new entry based on arguments.
+       // Apply double hashing method , one functor and the other with modulo function.
+       auto end { hashFunc( key ) % m_size };
+       auto auxiliaryFirst = m_table[end].begin();
+        while (auxiliaryFirst != m_table[end].end()) {
+            // Comparing keys inside the collision list.
+            auto it = *auxiliaryFirst;
+            if ( true == equalFunc( it.m_key , new_entry.m_key ) )
+            {
+                it = new_entry;
+                return false;
+            }
+            auxiliaryFirst++;
+        }
+        m_table[end].push_front(new_entry);
+        m_count++;
+        return true;
+
     }
 	
     //! Clears the data table.
@@ -81,6 +99,7 @@ namespace ac {
         for (auto i{0u}; i < m_size; i++) {
             m_table[i].clear();
         }
+        m_count = 0;
     }
 
     //! Tests whether the table is empty.
@@ -90,7 +109,9 @@ namespace ac {
     template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
     bool HashTbl<KeyType, DataType, KeyHash, KeyEqual>::empty() const
     {
-        // TODO
+        if(m_count == 0) {
+            return true;
+        }
         return false; // This is just a stub. Reaplace it accordinly.
     }
 
