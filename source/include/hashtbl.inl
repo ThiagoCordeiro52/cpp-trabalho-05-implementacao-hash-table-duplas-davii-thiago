@@ -30,12 +30,25 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( const std::initializer_list<entry_type>& ilist )
     {
+        // m_size = DEFAULT_SIZE;
+        // m_count = 0;
+        // m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
+        // for (auto& e: ilist)
+        //     insert(e.m_key, e.m_data);
+        // m_max_load_factor = 1;
+
         m_size = DEFAULT_SIZE;
-        m_count = 0;
         m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
-        for (auto& e: ilist)
-            insert(e.m_key, e.m_data);
+        m_count = ilist.size();
         m_max_load_factor = 1;
+        if(m_count / m_size > m_max_load_factor) {
+            rehash();
+        } 
+        m_count = 0;
+        for (auto& e: ilist) {
+            insert(e.m_key, e.m_data);
+        }
+
     }
 
     /// Assignment operator.
@@ -61,11 +74,19 @@ namespace ac {
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>&
     HashTbl<KeyType,DataType,KeyHash,KeyEqual>::operator=( const std::initializer_list< entry_type >& ilist )
     {
-        m_table.clear();
-        if(ilist.size() > m_size) {
-            m_size = ilist.size();
+        clear();
+        // m_count = ilist.size();
+        // if(max_load_factor() > 1) {
+        //     m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
+        // }
+        // m_count = ilist.size();
+        m_size = DEFAULT_SIZE;
+        if(m_count / m_size > m_max_load_factor) {
+            rehash();
+        } else {
             m_table = std::unique_ptr<std::forward_list<entry_type>[]>(new std::forward_list<entry_type>[m_size]);
         }
+        m_count = 0;
         for (auto& e: ilist)
             insert(e.m_key, e.m_data);
         return *this;
@@ -95,6 +116,9 @@ namespace ac {
                 return false;
             }
             auxiliaryFirst++;
+        }
+        if(m_count  / m_size > m_max_load_factor) {
+            rehash();
         }
         m_table[end].push_front(new_entry);
         m_count++;
@@ -163,11 +187,11 @@ namespace ac {
 
         for (auto i {0u}; i < m_size; i++) {
             for (auto it {m_table[i].begin()}; it != m_table[i].begin(); it++) {
-                auto pos {hash_function(it->key) % new_size};
+                auto pos {hash_function(it->m_key) % new_size};
                 new_table[pos].emplace_front(it->m_key, it->m_data);
             }
         }
-
+        m_size = new_size;
         m_table = std::move(new_table);
     }
 
@@ -238,17 +262,11 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
     DataType& HashTbl<KeyType, DataType, KeyHash, KeyEqual>::at( const KeyType & key )
     {
-        KeyHash hashFunc; // Instantiate the " functor " for primary hash.
-        KeyEqual equalFunc; // Instantiate the " functor " for the equal to test.
-        auto end { hashFunc( key ) % m_size };
-        auto auxiliaryFirst = m_table[end].begin();
-        while (auxiliaryFirst != m_table[end].end()) {
-            // Comparing keys inside the collision list.
-            auto it = *auxiliaryFirst;
-            if ( equalFunc( it.m_key, key ) == true )
-            {
-                return auxiliaryFirst->m_data;
-            }
+        auto pos {KeyHash{}(key) % m_size};
+        auto equal_func {KeyEqual{}};
+        for (auto it {m_table[pos].begin()}; it != m_table[pos].end(); it++) {
+            if (equal_func(it->m_key, key))
+                return it->m_data;
         }
         throw std::out_of_range("at(): invalid key for this method.");
         // return m_table[0].begin()->m_data; // Stub
@@ -269,9 +287,11 @@ namespace ac {
     }
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
-    float HashTbl<KeyType, DataType, KeyHash, KeyEqual>::max_load_factor() {
+    float HashTbl<KeyType, DataType, KeyHash, KeyEqual>::max_load_factor() const {
         return m_max_load_factor;
     }
+
+    template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
     void HashTbl<KeyType, DataType, KeyHash, KeyEqual>::max_load_factor(float mlf) {
         m_max_load_factor = mlf;
     }
