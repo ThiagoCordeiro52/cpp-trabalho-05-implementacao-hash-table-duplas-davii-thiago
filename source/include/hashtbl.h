@@ -63,7 +63,6 @@ namespace ac // Associative container
             void max_load_factor(float mlf);
 
             friend std::ostream & operator<<( std::ostream & os, const HashTbl & ht ) {
-
                 os << "{ ";
                 for (auto i{0u}; i < ht.m_size; i++) {
                     for (auto it{ht.m_table[i].begin()}; it != ht.m_table[i].end(); it++) {
