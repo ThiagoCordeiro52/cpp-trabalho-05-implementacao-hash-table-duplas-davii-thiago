@@ -42,6 +42,7 @@ namespace ac // Associative container
             using list_type = std::forward_list< entry_type >;
             using size_type = std::size_t;
 
+            
             explicit HashTbl( size_type table_sz_ = DEFAULT_SIZE );
             HashTbl( const HashTbl& );
             HashTbl( const std::initializer_list< entry_type > & );

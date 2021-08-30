@@ -14,11 +14,8 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::HashTbl( const HashTbl& source )
 	{
-        if (m_size != source.m_size) {
-            m_size = source.m_size;
-            auto new_table {std::unique_ptr<list_type[]>(new list_type[m_size])};
-            m_table = std::move(new_table);
-        }
+        m_size = source.m_size;
+        m_table = std::unique_ptr<list_type[]>(new list_type[m_size]);
         for (auto i{0u}; i < m_size; i++) {
             m_table[i] = source.m_table[i];
         }
@@ -78,7 +75,7 @@ namespace ac {
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
 	HashTbl<KeyType,DataType,KeyHash,KeyEqual>::~HashTbl( )
 	{
-        /* empty */
+        clear();
 	}
 
 	template< typename KeyType, typename DataType, typename KeyHash, typename KeyEqual >
