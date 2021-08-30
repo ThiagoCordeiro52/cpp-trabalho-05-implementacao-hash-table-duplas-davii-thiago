@@ -83,11 +83,12 @@ namespace ac {
     {
         KeyHash hash_func; // Instantiate the " functor " for primary hash.
         KeyEqual equal_func; // Instantiate the " functor " for the equal to test.
+
         m_count++;
         if (m_count / m_size > m_max_load_factor)
             rehash();
 
-        // Apply double hashing method , one functor and the other with modulo function.
+        // Apply double hashing method, one functor and the other with modulo function.
         auto end {hash_func(key) % m_size};
         for (auto it {m_table[end].begin()}; it != m_table[end].end(); it++) {
             // Comparing keys inside the collision list.
@@ -97,17 +98,6 @@ namespace ac {
             }
         }
         m_table[end].emplace_front(key, new_data);
-        // auto auxiliaryFirst = m_table[end].begin();
-        // while (auxiliaryFirst != m_table[end].end()) {
-        //      // Comparing keys inside the collision list.
-        //      auto it = *auxiliaryFirst;
-        //      if ( equal_func( it.m_key, new_entry.m_key ) ) {
-        //          *(auxiliaryFirst) = new_entry;
-        //          return false;
-        //      }
-        //      auxiliaryFirst++;
-        //  }
-        //  m_table[end].push_front(new_entry);
         return true;
     }
 	
@@ -189,7 +179,7 @@ namespace ac {
         auto end {KeyHash{}(key) % m_size};
 
         // deal with the of an empty list
-        if (m_table[end].begin() == m_table[end].end())
+        if (m_table[end].empty())
             return false;
 
         auto equal_func {KeyEqual{}};
@@ -218,10 +208,7 @@ namespace ac {
         if (n % 2 == 0)
             return false;
 
-        if (n % 3 == 0)
-            return false;
-
-        for (auto i {5u}; i <= (size_type)sqrt(n); i += 6) {
+        for (auto i {3u}; i <= (size_type)sqrt(n); i += 2) {
             if (n % i == 0)
                 return false;
         }
